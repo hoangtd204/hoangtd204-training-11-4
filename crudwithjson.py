@@ -9,25 +9,53 @@ def read_user_from_file(filename):
             return json.load(f)
     return []
 
-#hàm nhập thông tin danh bạ
-def get_user_input():
-    name = input('Vui lòng nhập tên: ')
-    phonenumber = input('Vui lòng nhập số điện thoại: ')
-    email = input('Nhập email:')
-    regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    phone_regex = r'^0\d{9}$'
-#regexforphonenumber
-    if re.match(phone_regex, phonenumber):
-        print(" Số điện thoại hợp lệ!")
-        
-    else:
-        print("Số bạn nhập không đúng định dạng")
 
-#regexforemail        
-    if re.match(regex, email):
-      print("Email hợp lệ!")
-    else:
-      print("Email không hợp lệ!")
+#requireforEmail
+def validEmail(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email)
+# #requireName
+def validName(users,name):
+    for person in users:
+      if person['name']== name:
+        return False
+    return name  
+   
+#requireforPhoneNumber
+def validPhone(phone):
+    pattern = r'^0\d{9}$'  
+    
+    return re.match(pattern, phone)
+
+def validDupli(users,phone):
+   for person in users:
+      if person['phonenumber']== phone:
+        return False
+    return phone
+
+#hàm nhập thông tin danh bạ
+def get_user_input(users):
+    
+        
+    while True:
+      name = input('Vui lòng nhập tên: ')
+      if validName(users,name):
+         break
+      else:print("Tên bạn nhập bị trùng lặp")
+    
+
+    while True:
+       phonenumber = input('Vui lòng nhập số điện thoại: ')
+       if validPhone(phonenumber):
+        break
+       else:print("Bạn nhập sai định dạng sđt vui lòng nhập lại vd:0353634530")
+    
+    
+    while True:
+       email = input('Vui lòng nhập email: ')
+       if validEmail(email):
+        break
+       else:print("Bạn nhập sai định dạng email vui lòng nhập lại vd:tangduchoang34@gmail.com")
 
     user = {
         'name': name,
@@ -38,9 +66,7 @@ def get_user_input():
 
 #hàm xem toàn bộ thông tin liên hệ
 def read_alluser (users):
-   
-
-    if not alluser:
+    if not users:
         print("Không có liên hệ nào.")
         return
 
@@ -50,36 +76,37 @@ def read_alluser (users):
         print(f"   SĐT: {user['phonenumber']}")
         print(f"   Email: {user['email']}\n")
 
-#hàm cập nhật thông tin liên hệ
+# # hàm cập nhật thông tin liên hệ
 # def update_user(users):
     
     
    
-#hàm xóa thông tin liên hệ
-# def delete_user(users):
-#     if not users:
-#         print("Không có liên hệ nào để xoá.")
-#         return
-
-#     name_to_delete = input("Nhập tên liên hệ muốn xoá: ").strip().lower()
-#     original_len = len(users)
-#     new_users = []
-
-#     for user in users:
+#các hàm xóa thông tin liên hệ
+def findPersonByName(nametarget,users):
+   for person in users:
+      if person["name"]== nametarget:
+        return person
    
-#         name = user['name'].strip().lower()
-#         if name != name_to_delete:
-#             new_users.append(user)
+   return print("Tên bạn nhập không có trong danh bạ")
 
-#     users[:] = new_users  # Cập nhật danh sách gốc
+def delete_user(filename,users):
+    if not users:
+        print("Không có liên hệ nào để xoá.")
+        return
+    else:
+       name_to_delete = input('Nhập tên muốn xóa trong danh bạ: ')
+       dicttarget= findPersonByName(name_to_delete,users)
+    #    print(f"{dicttarget}")
+       users.remove(dicttarget)
+    #    newPhoneBook =[ item for item in users if item.get("name") != name_to_delete]
+       
+    #    print(f"{data}")
 
-#     if len(users) < original_len:
-#         print("Đã xoá liên hệ có tên:", name_to_delete)
-#     else:
-#         print("Không tìm thấy liên hệ nào với tên đó.")
-
+    save_user_to_file(filename,users)
+    #    print(f"{newPhoneBook}")
 
 #hàm lưu thông tin vào file json
+
 def save_user_to_file(filename, users):
     with open(filename, 'w') as f:
         json.dump(users, f, indent=4)
@@ -95,12 +122,12 @@ def main():
      print("2. Xem liên hệ.")
      print("3. Cập nhật thông tin liên hệ.")
      print("4. Xóa liên hệ.")
-     print("4. Thoát chương trình.")
+     print("5. Thoát chương trình.")
      
      choice = input("Chọn: ")
      if choice == '1':
-       while True:
-         user = get_user_input()
+      while True:
+         user = get_user_input(users)
          users.append(user)
          save_user_to_file(filename, users)
          conti = input('Bạn có muốn nhập thêm thông tin liên hệ không (y/n)? ')
@@ -111,6 +138,10 @@ def main():
        read_alluser(users)
     
      elif choice == '3':
-       delete_user(users)
-    
+       update_user(users)
+     elif choice == '4':
+       delete_user(filename,users)
+     elif choice == '5':
+        break
+
 main()
