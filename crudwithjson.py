@@ -12,41 +12,48 @@ def read_user_from_file(filename):
 
 #requireforEmail
 def validEmail(email):
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    pattern = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
     return re.match(pattern, email)
-# #requireName
-def validName(users,name):
-    for person in users:
-        if person['name']== name:
-         return False
-    return name  
    
 #requireforPhoneNumber
 def validPhone(phone):
-    pattern = r'^0\d{9}$'  
-    
+    pattern = r'^0\d{9}$'
     return re.match(pattern, phone)
 
-def validDupli(users, phone):
+#kiểm tra trùng lặp tên
+def valid_Name_Dupli(users,name):
+    for person in users:
+        if person['name']== name:
+         return False
+    return True  
+  
+   
+#kiểm tra trùng lặp email
+def valid_Email_Dupli(users,email):
+    for person in users:
+        if person['email']== email:
+         return False
+    return True
+
+#kiểm tra trùng lặp sđt
+def valid_Phone_Dupli(users,phone):
     for person in users:
         if person['phonenumber'] == phone:
             return False
     return True
 
 #hàm nhập thông tin danh bạ
-def get_user_input(users):
-    
-        
+def get_user_input(users): 
     while True:
       name = input('Vui lòng nhập tên: ')
-      if validName(users,name):
+      if valid_Name_Dupli(users,name):
          break
       else:print("Tên bạn nhập bị trùng lặp")
     
 
     while True:
        phonenumber = input('Vui lòng nhập số điện thoại: ')
-       if validPhone(phonenumber) and validDupli(users, phonenumber):
+       if validPhone(phonenumber) and valid_Phone_Dupli(users, phonenumber):
         break
        
        else:
@@ -55,9 +62,9 @@ def get_user_input(users):
     
     while True:
        email = input('Vui lòng nhập email: ')
-       if validEmail(email):
+       if validEmail(email)and valid_Email_Dupli(users,email):
         break
-       else:print("Bạn nhập sai định dạng email vui lòng nhập lại vd:tangduchoang34@gmail.com")
+       else:print("Bạn nhập sai định dạng email hoặc email đã được được sử dụng")
 
     user = {
         'name': name,
@@ -65,6 +72,37 @@ def get_user_input(users):
         'email':email
     }
     return user
+
+#Các hàm cập nhật thông tin liên hệ
+
+def get_input_to_update(filename,dicttarget_to_update,users):
+
+    while True:
+        newName= input('Nhập tên mới:  ')
+        if valid_Name_Dupli(users,newName):
+            dicttarget_to_update['name']=newName
+            save_user_to_file(filename,users)  
+            break
+        else:
+            print("Tên mới không hợp lệ hoặc đã bị trùng") 
+
+    while True:
+        newEmail= input('Nhập email mới:  ')
+        if validEmail(newEmail) and valid_Email_Dupli(users,newEmail) :
+           dicttarget_to_update['email']=newEmail
+           save_user_to_file(filename,users)  
+           break
+        else:
+          print("Email mới không hợp lệ")
+
+    while True:
+        newPhoneNumber= input('Nhập sđt mới:  ')
+        if validPhone(newPhoneNumber) and valid_Phone_Dupli(users,newPhoneNumber):
+            dicttarget_to_update['phonenumber']=newPhoneNumber
+            save_user_to_file(filename,users)  
+            break
+        else:
+            print("Số điện thoại mới không hợp lệ hoặc bị trùng lặp")
 
 #Hàm xem toàn bộ thông tin liên hệ
 def read_alluser (users):
@@ -78,39 +116,9 @@ def read_alluser (users):
         print(f"   SĐT: {user['phonenumber']}")
         print(f"   Email: {user['email']}\n")
 
-#Các hàm cập nhật thông tin liên hệ
-
-def get_input_to_update(filename,dicttarget_to_update,users):
-
-    while True:
-        newName= input('Nhập tên mới:  ')
-        if validName(users,newName):
-            dicttarget_to_update['name']=newName
-            save_user_to_file(filename,users)  
-            break
-        else:
-            print("Tên mới không hợp lệ") 
-    while True:
-        newEmail= input('Nhập email mới:  ')
-        if validEmail(newEmail):
-           dicttarget_to_update['email']=newEmail
-           save_user_to_file(filename,users)  
-           break
-        else:
-          print("Email mới không hợp lệ")
-    while True:
-        newPhoneNumber= input('Nhập sđt mới:  ')
-        if validPhone(newPhoneNumber) and validDupli(users,newPhoneNumber):
-            dicttarget_to_update['phonenumber']=newPhoneNumber
-            save_user_to_file(filename,users)  
-            break
-        else:
-            print("Số điện thoại mới không hợp lệ")
 
 
-
-
-
+#Hàm update thông tin danh bạ
 def update_user(filename,users):
     if not users:
         print("Không có liên hệ nào để cập nhật.")
