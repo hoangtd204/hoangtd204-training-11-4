@@ -17,8 +17,8 @@ def validEmail(email):
 # #requireName
 def validName(users,name):
     for person in users:
-      if person['name']== name:
-        return False
+        if person['name']== name:
+         return False
     return name  
    
 #requireforPhoneNumber
@@ -27,11 +27,11 @@ def validPhone(phone):
     
     return re.match(pattern, phone)
 
-def validDupli(users,phone):
-   for person in users:
-      if person['phonenumber']== phone:
-        return False
-    return phone
+def validDupli(users, phone):
+    for person in users:
+        if person['phonenumber'] == phone:
+            return False
+    return True
 
 #hàm nhập thông tin danh bạ
 def get_user_input(users):
@@ -46,9 +46,10 @@ def get_user_input(users):
 
     while True:
        phonenumber = input('Vui lòng nhập số điện thoại: ')
-       if validPhone(phonenumber):
+       if validPhone(phonenumber) == True and  validDupli(users,phonenumber) == True:
         break
-       else:print("Bạn nhập sai định dạng sđt vui lòng nhập lại vd:0353634530")
+       
+       else:print("Bạn nhập sai định dạng hoặc đã bị trùng lặp")
     
     
     while True:
@@ -64,7 +65,7 @@ def get_user_input(users):
     }
     return user
 
-#hàm xem toàn bộ thông tin liên hệ
+#Hàm xem toàn bộ thông tin liên hệ
 def read_alluser (users):
     if not users:
         print("Không có liên hệ nào.")
@@ -76,18 +77,28 @@ def read_alluser (users):
         print(f"   SĐT: {user['phonenumber']}")
         print(f"   Email: {user['email']}\n")
 
-# # hàm cập nhật thông tin liên hệ
+#Các hàm cập nhật thông tin liên hệ
 # def update_user(users):
-    
-    
-   
-#các hàm xóa thông tin liên hệ
+#     if not users:
+#         print("Không có liên hệ nào để cập nhật.")
+#         return
+#     else:
+#        name_to_update = input("Nhập tên bạn muốn update thông tin:  ")
+#        dicttarget_to_update = findPersonByName(name_to_update,users)
+#        if dicttarget_to_update:
+#                 newName= input('Nhập tên mới')
+                               
+#                 dicttarget_to_update['name']=newName
+
+#        else :
+#             print("Tên bạn nhập không có trong danh bạ")
+#Các hàm xóa thông tin liên hệ
 def findPersonByName(nametarget,users):
    for person in users:
       if person["name"]== nametarget:
         return person
    
-   return print("Tên bạn nhập không có trong danh bạ")
+   return None
 
 def delete_user(filename,users):
     if not users:
@@ -95,12 +106,14 @@ def delete_user(filename,users):
         return
     else:
        name_to_delete = input('Nhập tên muốn xóa trong danh bạ: ')
-       dicttarget= findPersonByName(name_to_delete,users)
-    #    print(f"{dicttarget}")
-       users.remove(dicttarget)
-    #    newPhoneBook =[ item for item in users if item.get("name") != name_to_delete]
-       
-    #    print(f"{data}")
+       dicttarget_to_delete= findPersonByName(name_to_delete,users)
+       if  dicttarget_to_delete:
+         users.remove(dicttarget_to_delete)
+         save_user_to_file(filename,users)  
+         print("Tên bạn nhập đã bị xóa trong danh bạ")
+       else :
+          print("Tên bạn nhập không có trong danh bạ")
+          
 
     save_user_to_file(filename,users)
     #    print(f"{newPhoneBook}")
