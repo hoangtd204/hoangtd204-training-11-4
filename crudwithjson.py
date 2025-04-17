@@ -46,10 +46,11 @@ def get_user_input(users):
 
     while True:
        phonenumber = input('Vui lòng nhập số điện thoại: ')
-       if validPhone(phonenumber) == True and  validDupli(users,phonenumber) == True:
+       if validPhone(phonenumber) and validDupli(users, phonenumber):
         break
        
-       else:print("Bạn nhập sai định dạng hoặc đã bị trùng lặp")
+       else:
+        print("Bạn nhập sai định dạng hoặc đã bị trùng lặp")
     
     
     while True:
@@ -78,20 +79,51 @@ def read_alluser (users):
         print(f"   Email: {user['email']}\n")
 
 #Các hàm cập nhật thông tin liên hệ
-# def update_user(users):
-#     if not users:
-#         print("Không có liên hệ nào để cập nhật.")
-#         return
-#     else:
-#        name_to_update = input("Nhập tên bạn muốn update thông tin:  ")
-#        dicttarget_to_update = findPersonByName(name_to_update,users)
-#        if dicttarget_to_update:
-#                 newName= input('Nhập tên mới')
-                               
-#                 dicttarget_to_update['name']=newName
 
-#        else :
-#             print("Tên bạn nhập không có trong danh bạ")
+def get_input_to_update(filename,dicttarget_to_update,users):
+
+    while True:
+        newName= input('Nhập tên mới:  ')
+        if validName(users,newName):
+            dicttarget_to_update['name']=newName
+            save_user_to_file(filename,users)  
+            break
+        else:
+            print("Tên mới không hợp lệ") 
+    while True:
+        newEmail= input('Nhập email mới:  ')
+        if validEmail(newEmail):
+           dicttarget_to_update['email']=newEmail
+           save_user_to_file(filename,users)  
+           break
+        else:
+          print("Email mới không hợp lệ")
+    while True:
+        newPhoneNumber= input('Nhập sđt mới:  ')
+        if validPhone(newPhoneNumber) and validDupli(users,newPhoneNumber):
+            dicttarget_to_update['phonenumber']=newPhoneNumber
+            save_user_to_file(filename,users)  
+            break
+        else:
+            print("Số điện thoại mới không hợp lệ")
+
+
+
+
+
+def update_user(filename,users):
+    if not users:
+        print("Không có liên hệ nào để cập nhật.")
+        return
+    else:
+       name_to_update = input("Nhập tên của thông tin liên hệ  bạn muốn update thông tin:  ")
+       dicttarget_to_update = findPersonByName(name_to_update,users)
+       if dicttarget_to_update:
+         get_input_to_update(filename,dicttarget_to_update,users)
+       else :
+            print("Tên bạn nhập không có trong danh bạ")
+
+            
 #Các hàm xóa thông tin liên hệ
 def findPersonByName(nametarget,users):
    for person in users:
@@ -115,8 +147,7 @@ def delete_user(filename,users):
           print("Tên bạn nhập không có trong danh bạ")
           
 
-    save_user_to_file(filename,users)
-    #    print(f"{newPhoneBook}")
+
 
 #hàm lưu thông tin vào file json
 
@@ -151,7 +182,7 @@ def main():
        read_alluser(users)
     
      elif choice == '3':
-       update_user(users)
+       update_user(filename,users)
      elif choice == '4':
        delete_user(filename,users)
      elif choice == '5':
